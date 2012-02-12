@@ -1,16 +1,18 @@
 class Project
-  attr_accessor :title, :docs
+  attr_accessor :title, :documents
 
-  def initialize(title = "newProject")
+  def initialize(title)
     @title      = title
-    @docs       = []
+    @documents  = []
+
+    puts "Dir.mkdir(#{title})."
   end
 
-  def add(doc)
-    @docs.push(doc)
+  def add(document)
+    @documents.push(document)
   end
 
-  def rm(doc)
-    @docs.delete(doc)
+  def rm(document)
+    @documents.delete(document)
   end
 end
