@@ -1,7 +1,5 @@
 1.0
 ===
-- Clear distinction between application, windows, projects and documents
-- A way to create and continue existing projects
-- Proper creation of links with HTML emphasis
-- Save and load documents (!)
-- Tiny settings dialog for theming and tweaks (delay of autosaving, ...)
+- Change project title and load existing projects
+- Make links working properly
+- Handle links with references which would allow links update when document titles are changed
