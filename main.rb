@@ -2,7 +2,6 @@ require 'Qt4'
 require File.join('.', 'project.rb')
 require File.join('.', 'document.rb')
 require File.join('.', 'window.rb')
-require File.join('.', 'link.rb')
 
 class Notes < Qt::Application
   def initialize(projectTitle = 'newProject', documentTitle = 'newDocument')

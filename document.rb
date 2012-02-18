@@ -1,17 +1,13 @@
 require 'Qt4'
 
 class Document < Qt::TextDocument
-  attr_accessor :title, :text, :links
-  slots 'update(text)'
-  slots 'linkTo(string, document)'
+  attr_accessor :text, :title
 
   def initialize(project, title = 'newDocument')
     super()
 
     @project    = project
     @title      = title
-    @text       = ""
-    @links      = []
 
     puts "Document.new(#{project.title}, #{title})"
 
@@ -22,26 +18,11 @@ class Document < Qt::TextDocument
     @project.rm(self)
   end
 
-  def update(text)
-    @text = text
-  end
-
-  def linkTo(string, document)
-    puts "Linking #{self.title} to #{document.title}"
-    l = Link.new(string, document)
-    @links.push(l)
-  end
-
-  def unlink(string, doc)
-    puts "Unlinking #{string} to #{doc}"
-    # STUB
-  end
-
   def save?
     # TODO
     # Here, scan last modification time of file.
     # If lesser than 20 seconds (changeable), returns false.
-    puts "Document.save?(): TODO"
+#    puts "Document.save?(): TODO"
 
     return true
   end
