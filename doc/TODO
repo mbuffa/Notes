@@ -1,0 +1,6 @@
+1.0
+===
+- Change project title and load existing projects
+- Make links working properly
+- Handle links with references which would allow links update when document titles are changed
+- Delete old and unused files upon document title change

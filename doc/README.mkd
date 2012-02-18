@@ -1,0 +1,24 @@
+# Notes
+
+## Description
+
+`Notes` is a one-shot Ruby/Qt4 project I (Maxime Buffa) have
+originally written in three days in order to discover Qt, a wonderful
+GUI library.
+
+`Notes` is not supposed to be used in production. I just wanted to
+make my own little Tomboy/Gnotes clone for toying purposes. Therefore,
+I won't guarantee any new features or fixes.
+
+## Dependencies
+
+`Notes` uses the following softwares :
+ - [Ruby](http://www.ruby-lang.org/)
+ - [Qt](http://qt.nokia.com/products/)
+ - [QtRuby](http://rubyforge.org/projects/korundum/)
+ - [Ruby XDG](http://rubyworks.github.com/xdg/)
+
+## Contact
+
+I'd be glad to read your suggestions or trolls via Github or at
+<mbuffa@gmail.com> :-)
