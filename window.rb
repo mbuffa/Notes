@@ -1,147 +1,125 @@
 require 'Qt4'
 
-class Window < Qt::Dialog
-  attr_reader :document
-  slots :updateTitle, :validateTitle, :updateText, :linkDocument#, :insertReference
-#  slots 'linkClicked(QUrl)'
-#  signals :referenceFound
+module Notes
+  class Window < Qt::Dialog
+    attr_reader :document
+    slots 'updateTitle()', 'validateTitle()', 'updateText()', 'linkDocument()', 'linkClicked(QUrl)'
 
-  def initialize(project, document)
-    super()
+    def initialize(project, document, parentWindow = nil)
+      super()
 
-    @project     = project
-    @document    = document
+      @project    = project
+      @document   = document
+      @parent     = parentWindow
 
-    #
-    # Tool Bar instanciation
-    #
-    @toolBar            = Qt::ToolBar.new()
+      #
+      # Tool Bar instanciation
+      #
+      @toolBar            = Qt::ToolBar.new()
 
-    @actionProject      = Qt::Action.new(self)
-    @actionProject.text = @project.title
+      @actionProject      = Qt::Action.new(self)
+      @actionProject.text = @project.title
 
-    @actionLink         = Qt::Action.new(self)
-    @actionLink.text = 'Link'
+      @actionLink         = Qt::Action.new(self)
+      @actionLink.text = '&Link'
 
-    @toolBar.addAction(@actionProject)
-    @toolBar.addAction(@actionLink)
+      @toolBar.addAction(@actionProject)
+      @toolBar.addAction(@actionLink)
 
-    #
-    # Text Fields instanciation
-    #
-    @docTitle   = Qt::LineEdit.new()
-    @docTitle.text = @document.title
-    @docText    = Qt::TextBrowser.new()
-    @docText.readOnly = false
-    @docText.openLinks = true
-    @docText.openExternalLinks = true
-    @docText.html = @document.toHtml()
-#    @docText.html = "<a href='http://www.free.fr/'>Link</a>"
+      #
+      # Text Fields instanciation
+      #
+      @docTitle           = Qt::LineEdit.new()
+      @docTitle.text      = @document.title
+      @docText            = Qt::TextBrowser.new()
+      @docText.readOnly   = false
+      @docText.openLinks  = false
+      @docText.openExternalLinks = false
+      @docText.html       = @document.toHtml()
 
-    #
-    # Layout setup
-    #
-    @layout     = Qt::VBoxLayout.new()
-    @layout.addWidget(@toolBar)
-    @layout.addWidget(@docTitle)
-    @layout.addWidget(@docText)
-    self.setLayout(@layout)
+      #
+      # Layout setup
+      #
+      @layout = Qt::VBoxLayout.new()
+      @layout.addWidget(@toolBar)
+      @layout.addWidget(@docTitle)
+      @layout.addWidget(@docText)
+      self.setLayout(@layout)
 
-    #
-    # Signal connections
-    #
-    Qt::Object.connect(@docTitle,       SIGNAL('textChanged(QString)'), self, SLOT('updateTitle()'))
-    Qt::Object.connect(@docTitle,       SIGNAL('editingFinished()'),    self, SLOT('validateTitle()'))
-    Qt::Object.connect(@docText,        SIGNAL('textChanged()'),        self, SLOT('updateText()'))
-    Qt::Object.connect(@actionLink,     SIGNAL('triggered()'),          self, SLOT('linkDocument()'))
-#    Qt::Object.connect(self,            SIGNAL('referenceFound()'),     self, SLOT('insertReference()'))
-#    Qt::Object.connect(@docText,        SIGNAL('anchorClicked(QUrl)'),  self, SLOT('linkClicked(QUrl)'))
+      #
+      # Signal connections
+      #
+      Qt::Object.connect(@docTitle,       SIGNAL('textChanged(QString)'), self, SLOT('updateTitle()'))
+      Qt::Object.connect(@docTitle,       SIGNAL('editingFinished()'),    self, SLOT('validateTitle()'))
+      Qt::Object.connect(@docText,        SIGNAL('textChanged()'),        self, SLOT('updateText()'))
+      Qt::Object.connect(@actionLink,     SIGNAL('triggered()'),          self, SLOT('linkDocument()'))
+      Qt::Object.connect(@docText,        SIGNAL('anchorClicked(QUrl)'),  self, SLOT('linkClicked(QUrl)'))
 
-    self.updateTitle()
-  end
-
-  def updateTitle()
-    if @docTitle.text.length == 0
-      setWindowTitle('Notes')
-    else
-      setWindowTitle('Notes' + ' [' + @docTitle.text + ']')
-      @docText.documentTitle = @docTitle.text
-    end
-  end
-
-  def validateTitle()
-    if @docTitle.text.length == 0
-      @docTitle.text = 'newDocument'
       self.updateTitle()
+
+      if not @parent.nil?
+        @docText.html = "<a href='file://#{@project.path}/#{@parent.document.filename}'>Back to #{@parent.document.title}</a>"
+      end
     end
-  end
 
-  def updateText()
-=begin
-    @project.documents.each { |doc|
-      if doc.title == @docTitle.text
-        next
+    def updateTitle()
+      if @docTitle.text.length == 0
+        setWindowTitle('Notes')
+      else
+        setWindowTitle('Notes' + ' [' + @docTitle.text + ']')
+        @docText.documentTitle = @docTitle.text
       end
-
-      puts @docText.toHtml()
-      puts "Looking for #{doc.title}"
-      index = @docText.toHtml().index(/(?!\<a\shref=\'.*\')(?!\')#{doc.title}(?!\')(?!\<\/a\>)/)
-      if index != nil
-        puts "Found!"
-#       emit referenceFound()
-      end
-    }
-=end
-    @document.html = @docText.toHtml()
-
-    if @document.save?()
-      @document.save!()
     end
-  end
-=begin
-  def insertReference()
-    puts "Insert!"
-    @project.documents.each { |doc|
-      if doc.title == @docTitle.text
-        next
+
+    def validateTitle()
+      if @docTitle.text.length == 0
+        @docTitle.text = 'newDocument'
+        self.updateTitle()
       end
+    end
 
-      @docText.html = @docText.toHtml().sub(/(?!\<a\shref=\'.*\')(?!\')#{doc.title}(?!\')(?!\<\/a\>)/, "<a href='#{doc.title}'>#{doc.title}</a>")
-    }
-  end
-=end
-  def linkDocument()
-    selectedText = @docText.textCursor().selectedText()
+    def updateText()
+      @document.html = @docText.toHtml()
 
-    if not selectedText.empty?
-      self.updateSelection()
+      if @document.save?()
+        @document.save!()
+      end
+    end
 
-      newWindow = Window.new(@project, Document.new(@project, selectedText))
+    def linkDocument()
+      selectedText = @docText.textCursor().selectedText()
+
+      if not selectedText.empty?
+        newWindow = Notes::Window.new(@project, Notes::Document.new(@project, selectedText), self)
+        newWindow.show()
+
+        self.updateSelection()
+      else
+        puts "linkDocument(): You must select something to link!"
+      end
+    end
+
+    def updateSelection()
+      textCursor = @docText.textCursor()
+
+      if textCursor.hasSelection()
+        selectedText = textCursor.selectedText()
+
+        textCursor.removeSelectedText()
+        textCursor.insertHtml("<a href='file://#{@project.path}/#{selectedText}.html'>#{selectedText}</a>")
+
+        @docText.textCursor = textCursor
+      else
+        puts "updateSelection(): Nothing to update!"
+      end
+    end
+
+    def linkClicked(qurl)
+      puts qurl
+
+      document  = File.new(qurl, 'a')
+      newWindow = Notes::Window.new(@project, Notes::Document.new(@project, document))
       newWindow.show()
-    else
-      puts "You must select something to link!"
     end
   end
-
-  def updateSelection()
-    textCursor = @docText.textCursor()
-
-    if textCursor.hasSelection()
-      selectedText = textCursor.selectedText()
-
-      textCursor.removeSelectedText()
-      textCursor.insertHtml("<a href='#{selectedText}'>#{selectedText}</a>")
-
-      @docText.textCursor = textCursor
-    else
-      puts "updateSelection(): Nothing to update!"
-    end
-  end
-=begin
-  def linkClicked(qurl)
-    document = File.new(qurl, 'a')
-    newWindow = Window.new(@project, Document.new(@project, document))
-    newWindow.show()
-  end
-=end
 end
