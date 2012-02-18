@@ -8,8 +8,16 @@ module Notes
       @documents = []
       @path      = File.join(path, @title)
 
-#      puts "Dir.mkdir(#{path})"
-      Dir.mkdir(@path)
+      if File.exists?(@path)
+        if File.directory?(@path)
+          puts "Project.new(): #{@path} already exists"
+        else
+          puts "Project.new(): #{@path} is a file, deleting..."
+          Dir.delete(@path)
+        end
+      else
+        Dir.mkdir(@path)
+      end
     end
 
     def add(document)

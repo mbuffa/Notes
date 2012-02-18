@@ -58,8 +58,13 @@ module Notes
       self.updateTitle()
 
       if not @parent.nil?
-        @docText.html = "<a href='file://#{@project.path}/#{@parent.document.filename}'>Back to #{@parent.document.title}</a>"
+        self.backLink()
       end
+    end
+
+    def backLink()
+      link = "<a href='#{@parent.document.filename}'>Back to #{@parent.document.title}</a><p></p>"
+      @docText.html = link
     end
 
     def updateTitle()
@@ -94,6 +99,7 @@ module Notes
         newWindow.show()
 
         self.updateSelection()
+        @document.save!()
       else
         puts "linkDocument(): You must select something to link!"
       end

@@ -2,7 +2,7 @@ require 'Qt4'
 
 module Notes
   class Document < Qt::TextDocument
-    attr_accessor :text, :title, :filename
+    attr_accessor :title, :filename, :path
 
     def initialize(project, title = 'newDocument')
       super()
@@ -10,11 +10,11 @@ module Notes
       @project    = project
       @title      = title
       @filename   = title + ".html"
+      @path       = File.join(@project.path, @filename)
+      @file       = nil
 
-#      puts "Document.new(#{project.title}, #{title})"
-#      puts "File.new(File.join('#{@project.path}', '#{@filename}'), 'a+')"
-      File.new(File.join(@project.path, @filename), "a+")
-
+      self.load()
+      self.save!()
       @project.add(self)
     end
 
@@ -23,21 +23,43 @@ module Notes
     end
 
     def save?
-      # TODO
-      # Here, scan last modification time of file.
-      # If lesser than 20 seconds (changeable), returns false.
-      #    puts "Document.save?(): TODO"
+      if not File.exists?(@path)
+        return true
+      end
 
-      return true
+      @file = File.new(@path, "r")
+      mtime = File.mtime(@file)
+      now   = Time.new()
+
+      # 20.0 seconds is way too big.
+      if (now - mtime) > 5.0
+        puts "Document.save?(): #{@path} needs update!"
+        return true
+      else
+        return false
+      end
+      @file.close()
     end
 
     def save!
-      # This function effectively saves file on disc drive.
-      #    File.new(File.join('.', @currentProject.title, @title, "a+")
+      puts "Document.save!(): Writing #{@path}"
+      @file = File.new(@path, "w+")
+      @file.write(self.toHtml())
+      @file.close()
     end
 
     def load
-      # TODO
+      if File.exists?(@path)
+        puts "Document.new(): #{@path} already exists"
+
+        if File.writable?(@path)
+          @file = File.new(@path, "a+")
+          puts "Document.load(): Loading #{@path}"
+          self.html = @file.read()
+        else
+          raise("Document.new(): #{@path} cannot be overwritten")
+        end
+      end
     end
   end
 end
