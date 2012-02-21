@@ -87,7 +87,7 @@ module Notes
       @document.html = @docText.toHtml()
 
       if @document.save?()
-        @document.save!()
+        @document.save()
       end
     end
 
@@ -99,7 +99,7 @@ module Notes
         newWindow.show()
 
         self.updateSelection()
-        @document.save!()
+        @document.save()
       else
         puts "linkDocument(): You must select something to link!"
       end

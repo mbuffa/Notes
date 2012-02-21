@@ -41,7 +41,7 @@ module Notes
       @file.close()
     end
 
-    def save!
+    def save
       puts "Document.save!(): Writing #{@path}"
       @file = File.new(@path, "w+")
       @file.write(self.toHtml())
