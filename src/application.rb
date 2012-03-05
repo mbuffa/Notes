@@ -9,7 +9,7 @@ module Notes
     def initialize(projectTitle = 'newProject', documentTitle = 'newDocument')
       super(ARGV)
       @config     = Notes::Configuration.new()
-      @project    = Notes::Project.new(projectTitle, @config.config.home.to_s)
+      @project    = Notes::Project.new(projectTitle, @config.data_dir)
       @document   = Notes::Document.new(@project, documentTitle)
 
       w = Notes::Window.new(@project, @document)

@@ -13,10 +13,9 @@ I won't guarantee any new features or fixes.
 ## Dependencies
 
 `Notes` uses the following softwares :
- - [Ruby](http://www.ruby-lang.org/)
- - [Qt](http://qt.nokia.com/products/)
- - [QtRuby](http://rubyforge.org/projects/korundum/)
- - [Ruby XDG](http://rubyworks.github.com/xdg/)
+ * [Ruby](http://www.ruby-lang.org/)
+ * [Qt](http://qt.nokia.com/products/)
+ * [QtRuby](http://rubyforge.org/projects/korundum/)
 
 ## Contact
 

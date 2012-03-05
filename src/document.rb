@@ -14,7 +14,7 @@ module Notes
       @file       = nil
 
       self.load()
-      self.save!()
+      self.save()
       @project.add(self)
     end
 
@@ -23,9 +23,7 @@ module Notes
     end
 
     def save?
-      if not File.exists?(@path)
-        return true
-      end
+      true if File.exists?(@path) == false
 
       @file = File.new(@path, "r")
       mtime = File.mtime(@file)
@@ -42,7 +40,7 @@ module Notes
     end
 
     def save
-      puts "Document.save!(): Writing #{@path}"
+      puts "Document.save(): Writing #{@path}"
       @file = File.new(@path, "w+")
       @file.write(self.toHtml())
       @file.close()
